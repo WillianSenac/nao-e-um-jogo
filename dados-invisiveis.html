@@ -5,15 +5,14 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Dados Invisíveis</title>
 
-<!-- FONTE PIXEL -->
-<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap">
 
 <style>
 body {
     margin: 0;
     background: #0b0e1a;
-    color: #eee;
     font-family: 'Press Start 2P', monospace;
+    color: #fff;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -21,13 +20,12 @@ body {
 
 h1 {
     font-size: 12px;
-    margin: 12px;
+    margin: 10px;
     color: #6afff3;
 }
 
 #hud {
     width: 90%;
-    margin-bottom: 8px;
 }
 
 #bar {
@@ -37,35 +35,43 @@ h1 {
     background: #111;
 }
 
-#barFill {
+#fill {
     height: 100%;
     width: 100%;
     background: #6afff3;
 }
 
 canvas {
+    margin-top: 10px;
     background: #060914;
     border: 3px solid #6afff3;
 }
 
+#info {
+    font-size: 8px;
+    margin: 10px;
+    text-align: center;
+    min-height: 30px;
+}
+
 #controls {
-    margin-top: 12px;
     display: grid;
     grid-template-columns: 60px 60px 60px;
     gap: 8px;
+    margin-top: 8px;
 }
 
 button {
     padding: 12px;
-    font-family: 'Press Start 2P', monospace;
     font-size: 8px;
     background: #1c2145;
     color: #fff;
     border: 2px solid #6afff3;
+    font-family: 'Press Start 2P', monospace;
 }
 
-#ecaBtn {
-    margin-top: 10px;
+#eca {
+    margin-top: 8px;
     background: #6afff3;
     color: #000;
 }
@@ -77,79 +83,112 @@ button {
 <h1>DADOS INVISÍVEIS</h1>
 
 <div id="hud">
-    <div id="bar">
-        <div id="barFill"></div>
-    </div>
+    <div id="bar"><div id="fill"></div></div>
 </div>
 
-<canvas id="game" width="260" height="260"></canvas>
+<canvas id="game" width="280" height="280"></canvas>
+
+<div id="info">Ande pelo mundo digital.</div>
 
 <div id="controls">
     <div></div>
-    <button onclick="move(0,-1)">▲</button>
+    <button onmousedown="moveUp=true" onmouseup="moveUp=false">▲</button>
     <div></div>
-    <button onclick="move(-1,0)">◀</button>
-    <button onclick="move(1,0)">▶</button>
+    <button onmousedown="moveLeft=true" onmouseup="moveLeft=false">◀</button>
+    <button onmousedown="moveRight=true" onmouseup="moveRight=false">▶</button>
     <div></div>
     <div></div>
-    <button onclick="move(0,1)">▼</button>
+    <button onmousedown="moveDown=true" onmouseup="moveDown=false">▼</button>
     <div></div>
 </div>
 
-<button id="ecaBtn" onclick="activateECA()">ATIVAR ECA DIGITAL</button>
+<button id="eca" onclick="activateECA()">ATIVAR ECA DIGITAL</button>
 
 <script>
 const canvas = document.getElementById("game");
 const ctx = canvas.getContext("2d");
 
-let player = { x: 120, y: 120, size: 10 };
 let identity = 100;
-let speed = 4;
-let ecaActive = false;
+let speed = 2;
+let gameOver = false;
+let eca = false;
+
+let player = { x: 140, y: 140, size: 10 };
+
+let moveUp=false, moveDown=false, moveLeft=false, moveRight=false;
 
 const apps = [
-    {x: 40, y: 40},
-    {x: 200, y: 60},
-    {x: 60, y: 200},
-    {x: 200, y: 200},
+    {x:40,y:40,name:"Rede Social"},
+    {x:200,y:50,name:"Jogo Online"},
+    {x:60,y:200,name:"Site"},
+    {x:200,y:200,name:"App Aleatório"}
 ];
 
-function draw() {
-    ctx.clearRect(0,0,260,260);
+function update() {
+    if (gameOver) return;
 
-    // apps
-    ctx.fillStyle = ecaActive ? "#333" : "#ff4d6d";
-    apps.forEach(a => {
-        ctx.fillRect(a.x, a.y, 12, 12);
-    });
+    if (moveUp) player.y -= speed;
+    if (moveDown) player.y += speed;
+    if (moveLeft) player.x -= speed;
+    if (moveRight) player.x += speed;
 
-    // player
-    ctx.fillStyle = "#6afff3";
-    ctx.fillRect(player.x, player.y, player.size, player.size);
-}
+    apps.forEach(app => {
+        if (!eca &&
+            player.x < app.x+14 &&
+            player.x+10 > app.x &&
+            player.y < app.y+14 &&
+            player.y+10 > app.y) {
 
-function move(dx,dy) {
-    player.x += dx * speed;
-    player.y += dy * speed;
-
-    apps.forEach(a => {
-        if (!ecaActive &&
-            player.x < a.x+12 &&
-            player.x+10 > a.x &&
-            player.y < a.y+12 &&
-            player.y+10 > a.y) {
-
-            identity -= 10;
-            speed = Math.max(1, speed - 0.5);
-            updateBar();
+            identity -= 0.2;
+            speed = Math.max(0.5, speed - 0.002);
+            document.getElementById("info").innerText =
+                app.name + " coletou dados...";
         }
     });
 
+    if (identity <= 0) endGame();
+    updateBar();
+}
+
+function draw() {
+    ctx.clearRect(0,0,280,280);
+
+    // apps
+    ctx.fillStyle = eca ? "#333" : "#ff4d6d";
+    apps.forEach(a => ctx.fillRect(a.x,a.y,14,14));
+
+    // player
+    ctx.fillStyle = "#6afff3";
+    ctx.fillRect(player.x,player.y,player.size,player.size);
+}
+
+function loop() {
+    update();
     draw();
+    requestAnimationFrame(loop);
 }
 
 function updateBar() {
-    document.getElementById("barFill").style.width = identity + "%";
+    document.getElementById("fill").style.width = Math.max(identity,0)+"%";
+}
+
+function endGame() {
+    gameOver = true;
+    document.getElementById("info").innerText =
+        "Você perdeu partes de si.\nNão percebeu quando aconteceu.";
 }
 
 function activateECA() {
+    eca = true;
+    identity = 100;
+    speed = 2;
+    document.getElementById("info").innerText =
+        "Com ECA Digital, a exploração para.";
+    navigator.vibrate?.(200);
+}
+
+loop();
+</script>
+
+</body>
+</html>
