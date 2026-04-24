@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Não Era Só um Jogo</title>
+
+<!-- Fonte pixel art -->
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+
+<style>
+    * {
+        box-sizing: border-box;
+    }
+
+    body {
+        margin: 0;
+        background-color: #0b0e1a;
+        color: #eaeaea;
+        font-family: 'Press Start 2P', monospace;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+    }
+
+    .game-container {
+        width: 380px;
+        background: #11152b;
+        border: 4px solid #6afff3;
+        box-shadow: 0 0 20px #00fff7;
+        padding: 16px;
+    }
+
+    .title {
+        text-align: center;
+        font-size: 14px;
+        margin-bottom: 12px;
+        color: #6afff3;
+    }
+
+    .screen {
+        background: #060914;
+        border: 2px solid #333;
+        padding: 12px;
+        margin-bottom: 12px;
+        font-size: 10px;
+        min-height: 140px;
+        line-height: 1.6;
+    }
+
+    .choices button {
+        width: 100%;
+        background: #1c2145;
+        border: 2px solid #6afff3;
+        color: #eaeaea;
+        padding: 10px;
+        margin-top: 8px;
+        font-family: 'Press Start 2P', monospace;
+        font-size: 9px;
+        cursor: pointer;
+        transition: 0.2s;
+    }
+
+    .choices button:hover {
+        background: #6afff3;
+        color: #0b0e1a;
+    }
+
+    .footer {
+        font-size: 7px;
+        text-align: center;
+        color: #888;
+        margin-top: 8px;
+    }
+</style>
+</head>
+
+<body>
+
+<div class="game-container">
+    <div class="title">NÃO ERA SÓ UM JOGO</div>
+    <div class="screen" id="text"></div>
+    <div class="choices" id="choices"></div>
+    <div class="footer">Pixel Narrative Game • HTML</div>
+</div>
+
+<script>
+const textElement = document.getElementById("text");
+const choicesElement = document.getElementById("choices");
+
+function showText(text, choices = []) {
+    textElement.innerHTML = text;
+    choicesElement.innerHTML = "";
+
+    choices.forEach(choice => {
+        const button = document.createElement("button");
+        button.innerText = choice.text;
+        button.onclick = choice.action;
+        choicesElement.appendChild(button);
+    });
+}
+
+// INÍCIO
+showText(
+`Você entrou em um novo jogo online.
+
+Chat ativado.
+Microfone desligado.
+Nickname: Player_X.
+
+Alguém entra na partida e te envia mensagem...`,
+[
+    { text: "Continuar", action: sceneChat }
+]
+);
+
+function sceneChat() {
+    showText(
+`[???]: eae, joga bem
+[???]: vc parece novo aqui
+
+O jogador usa um avatar raro.
+Algo chama sua atenção.`,
+    [
+        { text: "Responder normalmente", action: responder },
+        { text: "Ignorar mensagens", action: ignorar }
+    ]
+);
+}
+
+function responder() {
+    showText(
+`[Você]: valeu
+[???]: quantos anos vc tem?
+
+A pergunta não parece importante...
+mas o chat ficou em silêncio.`,
+    [
+        { text: "Responder a idade real", action: idade },
+        { text: "Mentir a idade", action: mentir },
+        { text: "Sair do chat", action: sair }
+    ]
+);
+}
+
+function idade() {
+    showText(
+`[Você]: 14
+[???]: relaxa, é de boa
+[???]: manda uma foto pra eu ver com quem jogo 😄`,
+    [
+        { text: "Enviar foto", action: finalRuim },
+        { text: "Dizer não e denunciar", action: finalBom }
+    ]
+);
+}
+
+function mentir() {
+    showText(
+`[Você]: 18
+[???]: sabia 😏
+[???]: então entra no meu server privado`,
+    [
+        { text: "Entrar no servidor", action: finalMuitoRuim },
+        { text: "Bloquear e denunciar", action: finalBom }
+    ]
+);
+}
+
+function ignorar() {
+    showText(
+`O jogador insiste.
+Outras contas começam a observar você.
+
+O jogo não te protege.
+Nenhuma opção de denúncia aparece.`,
+    [
+        { text: "Sair da partida", action: finalNeutro }
+    ]
+);
+}
+
+function sair() {
+    showText(
+`Você desconectou.
+Mas a sensação ficou.
+
+O jogo não fez nada para te proteger.`,
+    [
+        { text: "Finalizar", action: mensagemFinal }
+    ]
+);
+}
+
+// FINAIS
+function finalRuim() {
+    showText(
+`Horas depois, a conta desaparece.
+Sua imagem começa a circular fora do jogo.
+
+Você não estava em um jogo.
+Você estava em risco.`,
+    [
+        { text: "Finalizar", action: mensagemFinal }
+    ]
+);
+}
+
+function finalMuitoRuim() {
+    showText(
+`O servidor é privado.
+Mensagens estranhas.
+Pedidos piores.
+
+Não era só um jogo.
+Era uma armadilha.`,
+    [
+        { text: "Finalizar", action: mensagemFinal }
+    ]
+);
+}
+
+function finalNeutro() {
+    showText(
+`Você saiu a tempo.
+Mas ficou sem apoio.
+Sem denúncia.
+Sem orientação.`,
+    [
+        { text: "Finalizar", action: mensagemFinal }
+    ]
+);
+}
+
+function finalBom() {
+    showText(
+`Você denunciou.
+A conta foi derrubada.
+Mensagens bloqueadas.
+
+Dessa vez,
+alguém te protegeu.`,
+    [
+        { text: "Finalizar", action: mensagemFinalBoa }
+    ]
+);
+}
+
+function mensagemFinal() {
+    showText(
+`ANTES DO ECA DIGITAL
+
+Plataformas não eram obrigadas a proteger.
+Crianças eram tratadas como adultos online.
+
+Agora imagine isso acontecendo de verdade.`,
+    [
+        { text: "Reiniciar", action: () => location.reload() }
+    ]
+);
+}
+
+function mensagemFinalBoa() {
+    showText(
+`COM O ECA DIGITAL
+
+Plataformas devem:
+✔ Verificar idade
+✔ Criar ferramentas de denúncia
+✔ Proteger crianças por padrão
+
+Internet não é terra sem lei.`,
+    [
+        { text: "Reiniciar", action: () => location.reload() }
+    ]
+);
+}
+</script>
+
+</body>
+</html>
